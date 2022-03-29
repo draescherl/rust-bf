@@ -5,23 +5,15 @@ use std::{env, fs, process};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
-
     if args.len() == 1 {
         println!("Please provide a filename.");
         process::exit(0);
     }
 
     let filename = &args[1];
-    let source_code = fs::read_to_string(filename)
-        .expect("Could not find requested file.");
-    println!("{}", source_code);
-
+    let source_code = fs::read_to_string(filename).expect("Could not find requested file.");
     let lexed = lex(source_code);
     let parsed = parse(lexed);
-    for item in lexed {
-        println!("{:?}", item);
-    }
 }
 
 
