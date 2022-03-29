@@ -14,6 +14,11 @@ fn main() {
     let source_code = fs::read_to_string(filename).expect("Could not find requested file.");
     let lexed = lex(source_code);
     let parsed = parse(lexed);
+
+    let mut tape: Vec<u8> = vec![0; 1024];
+    let mut pointer: usize = tape.len() / 2; // Init in the middle of the Vec to allow the user to go to the left
+    println!("------ Running your brainf*ck program ------");
+    run(&parsed, &mut tape, &mut pointer);
 }
 
 
@@ -79,6 +84,20 @@ fn parse(tokens: Vec<Tokens>) -> Vec<Instructions> {
 
 
 // Interpret the AST
-fn run() {
-
+fn run(instructions: &Vec<Instructions>, tape: &mut Vec<u8>, pointer: &mut usize) {
+    for instruction in instructions {
+        match instruction {
+            Instructions::MoveRight => *pointer += 1,
+            Instructions::MoveLeft => *pointer -= 1,
+            Instructions::Increment => tape[*pointer] += 1,
+            Instructions::Decrement => tape[*pointer] -= 1,
+            Instructions::Print => print!("{}", tape[*pointer] as char),
+            Instructions::Input => {}, // TODO: implement user input
+            Instructions::Loop(subinstructions) => {
+                while tape[*pointer] != 0 {
+                    run(&subinstructions, tape, pointer)
+                }
+            }
+        }
+    }
 }
