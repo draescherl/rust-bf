@@ -2,7 +2,6 @@
 
 
 use std::{env, fs, process};
-use std::fmt::Formatter;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -19,9 +18,10 @@ fn main() {
     println!("{}", source_code);
 
     let lexed = lex(source_code);
-    // for item in lexed {
-    //     println!("{:?}", item);
-    // }
+    let parsed = parse(lexed);
+    for item in lexed {
+        println!("{:?}", item);
+    }
 }
 
 
@@ -50,10 +50,10 @@ enum Instructions {
 
 
 // Turn a sequence of characters into a sequence of tokens
-fn lex(chars: String) -> Vec<Option<Tokens>> {
+fn lex2(code: String) -> Vec<Tokens> {
     let mut tokens = Vec::new();
 
-    for char in chars.chars() {
+    for char in code.chars() {
         let token = match char {
             '>' => Some(Tokens::MoveRight),
             '<' => Some(Tokens::MoveLeft),
@@ -63,19 +63,23 @@ fn lex(chars: String) -> Vec<Option<Tokens>> {
             ',' => Some(Tokens::In),
             '[' => Some(Tokens::LoopEnter),
             ']' => Some(Tokens::LoopExit),
-            _ => None,
+            _ => None
         };
 
-        // All the characters that are not a valid token are treated as comments
-        if !token.is_none() { tokens.push(token); }
+        match token {
+            Some(token) => tokens.push(token),
+            None => (),
+        }
+
     }
 
     tokens
 }
 
 
+
 // Turn a sequence of tokens into an AST
-fn parse(tokens: Vec<Option<Tokens>>) -> Vec<Instructions> {
+fn parse(tokens: Vec<Tokens>) -> Vec<Instructions> {
     let mut ast: Vec<Instructions> = Vec::new();
 
     ast
