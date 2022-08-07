@@ -12,7 +12,8 @@ fn main() {
 
     let filename = &args[1];
     let source_code = fs::read_to_string(filename).expect("Could not find requested file.");
-    let lexed = lex(source_code);
+    // let lexed = lex(source_code);
+    let lexed = lex("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.".to_string());
     let parsed = parse(lexed);
 
     let mut tape: Vec<u8> = vec![0; 1024];
@@ -75,15 +76,35 @@ fn lex(code: String) -> Vec<Tokens> {
 
 
 
-// Turn a sequence of tokens into an AST
+// Turn a sequence of tokens into a sequence of instructions
 fn parse(tokens: Vec<Tokens>) -> Vec<Instructions> {
-    let mut ast: Vec<Instructions> = Vec::new();
+    let mut instructions: Vec<Instructions> = Vec::new();
 
-    ast
+    for (index, token) in tokens.iter().enumerate() {
+        let instruction = match token {
+            Tokens::MoveRight => Some(Instructions::MoveRight),
+            Tokens::MoveLeft => Some(Instructions::MoveLeft),
+            Tokens::Increment => Some(Instructions::Increment),
+            Tokens::Decrement => Some(Instructions::Decrement),
+            Tokens::Out => Some(Instructions::Print),
+            Tokens::In => Some(Instructions::Input),
+            Tokens::LoopEnter => Some(Instructions::Loop(
+                let remove_previous_tokens = tokens
+            )),
+            _ => None // TODO: implement loop
+        };
+
+        match instruction {
+            Some(instruction) => instructions.push(instruction),
+            None => ()
+        }
+    }
+
+    instructions
 }
 
 
-// Interpret the AST
+// Interpret the instructions
 fn run(instructions: &Vec<Instructions>, tape: &mut Vec<u8>, pointer: &mut usize) {
     for instruction in instructions {
         match instruction {
